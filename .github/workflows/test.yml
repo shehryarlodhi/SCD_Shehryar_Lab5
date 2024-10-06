@@ -3,26 +3,37 @@ name: Node.js CI
 on:
   push:
     branches:
-      - main
+      - main      # Run the tests when code is pushed to the 'main' branch
   pull_request:
     branches:
-      - main
+      - main      # Run the tests when a pull request is opened for 'main'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [20.x]
+  test:
+    runs-on: ubuntu-latest  # Runs the workflow on an Ubuntu virtual machine
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm install
-    - run: npm test
-      env:
-        CI: true
+      - name: Checkout code  # Checkout the code from your repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js  # Install the correct version of Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'  # Specify the version of Node.js
+
+      - name: Install dependencies  # Install all project dependencies
+        run: npm install
+
+      - name: Run tests  # Run the tests defined in the package.json
+        run: npm test
+
+      - name: Archive test results  # Optional step to store the test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: test-results/
+
+      - name: Upload coverage report  # Upload test coverage report (optional)
+        if: success()
+        run: npm run coverage  # If you have a coverage script
