@@ -71,4 +71,10 @@ app.put('/projects/:name/tasks/:title', authenticate, (req, res) => {
     }
 });
 
-app.listen(3000, () => console.log('Server started on port 3000'));
+// Export the app instead of starting the server
+module.exports = app;
+
+// If this file is run directly, start the server
+if (require.main === module) {
+    app.listen(3000, () => console.log('Server started on port 3000'));
+}
